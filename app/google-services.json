@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "575883135948",
+    "project_id": "bikestationapp-ca3",
+    "storage_bucket": "bikestationapp-ca3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575883135948:android:a5edcdb50bac7ed9c26b69",
+        "android_client_info": {
+          "package_name": "com.example.bikestationapp_ca3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX4_YiIb-MkD1zfwZ980nb5ZsNl9UTlSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
