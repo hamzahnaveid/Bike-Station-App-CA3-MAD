@@ -4,20 +4,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.bikestationapp_ca3.classes.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
-
+    FirebaseAuth auth;
+    DatabaseReference dbRef;
     EditText etEmail, etPassword;
     SharedPreferences sp;
 
@@ -31,7 +42,11 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        auth = FirebaseAuth.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference("users");
+
         sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
     }
@@ -53,13 +68,53 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        SharedPreferences.Editor editor = sp.edit();
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Logged in successfully!",
+                            Toast.LENGTH_SHORT
+                    ).show();
 
-        editor.putString("EMAIL", email);
-        editor.commit();
+                    putUserIDInSharedPref(email);
 
-        Intent intent = new Intent(MainActivity.this, MapActivity.class);
-        startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Login failed. Please try again.",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
+        });
+    }
+
+    public void putUserIDInSharedPref(String email) {
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    if (child.child("email").getValue().equals(email)) {
+                        Log.d("UserID:", "Key found: " + child.getKey());
+                        SharedPreferences.Editor editor = sp.edit();
+
+                        editor.putString("USER", child.getKey());
+                        editor.commit();
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 }

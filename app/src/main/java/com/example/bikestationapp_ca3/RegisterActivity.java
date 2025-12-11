@@ -24,8 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-
 public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth auth;
     EditText etEmail, etPassword, etName;
@@ -112,6 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                auth.signInWithEmailAndPassword(email, password);
                 Toast.makeText(RegisterActivity.this,
                         "User successfully registered",
                         Toast.LENGTH_SHORT
