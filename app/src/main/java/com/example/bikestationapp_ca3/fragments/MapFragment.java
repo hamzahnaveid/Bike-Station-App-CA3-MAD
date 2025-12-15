@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bikestationapp_ca3.R;
+import com.example.bikestationapp_ca3.adapters.StationInfoWindowAdapter;
 import com.example.bikestationapp_ca3.classes.Station;
 import com.example.bikestationapp_ca3.viewmodels.StationViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -103,17 +104,21 @@ public class MapFragment extends Fragment {
     }
 
     public void populateMapWithStations(List<Station> stations) {
+        googleMap.setInfoWindowAdapter(new StationInfoWindowAdapter(getActivity()));
+
         for (Station s : stations) {
-//            String snippet = "Status: " + s.getStatus() + "\n" +
-//                    "Available Bike Stands: " + s.getAvailable_bike_stands() + "\n" +
-//                    "Available Bikes: " + s.getAvailable_bikes();
+            String snippet = "Status: " + s.getStatus() + "\n" +
+                    "Total Bike Stands: " + s.getBike_stands() + "\n" +
+                    "Available Bike Stands: " + s.getAvailable_bike_stands() + "\n" +
+                    "Available Bikes: " + s.getAvailable_bikes();
             double lat = s.getPosition().get("lat");
             double lng = s.getPosition().get("lng");
 
             LatLng stationLatLng = new LatLng(lat, lng);
             MarkerOptions options = new MarkerOptions()
                     .position(stationLatLng)
-                    .title(s.getAddress());
+                    .title(s.getAddress())
+                    .snippet(snippet);
             googleMap.addMarker(options);
 
             Log.d("StationMarker", "Marker added: " + s.getName());
