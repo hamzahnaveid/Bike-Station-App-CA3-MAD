@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.bikestationapp_ca3.R;
 import com.example.bikestationapp_ca3.adapters.StationInfoWindowAdapter;
 import com.example.bikestationapp_ca3.classes.Station;
+import com.example.bikestationapp_ca3.classes.StationMarker;
 import com.example.bikestationapp_ca3.viewmodels.StationViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,7 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class MapFragment extends Fragment {
 
     GoogleMap googleMap;
     StationViewModel stationViewModel;
+    ClusterManager<StationMarker> clusterManager;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -58,7 +60,7 @@ public class MapFragment extends Fragment {
                 return;
             }
             googleMap.setMyLocationEnabled(true);
-
+            setUpClusterer();
             Log.d("GoogleMap", "Map ready");
 
             List<Station> stations = stationViewModel.getStations().getValue();
@@ -110,18 +112,24 @@ public class MapFragment extends Fragment {
             String snippet = "Status: " + s.getStatus() + "\n" +
                     "Total Bike Stands: " + s.getBike_stands() + "\n" +
                     "Available Bike Stands: " + s.getAvailable_bike_stands() + "\n" +
-                    "Available Bikes: " + s.getAvailable_bikes();
+                    "Available Bikes: " + s.getAvailable_bikes() + "\n" +
+                    "Last Updated: " + s.getLast_update();
+
             double lat = s.getPosition().get("lat");
             double lng = s.getPosition().get("lng");
-
             LatLng stationLatLng = new LatLng(lat, lng);
-            MarkerOptions options = new MarkerOptions()
-                    .position(stationLatLng)
-                    .title(s.getAddress())
-                    .snippet(snippet);
-            googleMap.addMarker(options);
+            String address = s.getAddress();
+
+            StationMarker marker = new StationMarker(stationLatLng, address, snippet);
+            clusterManager.addItem(marker);
 
             Log.d("StationMarker", "Marker added: " + s.getName());
         }
+    }
+
+    public void setUpClusterer() {
+        clusterManager = new ClusterManager<StationMarker>(getActivity(), googleMap);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnMarkerClickListener(clusterManager);
     }
 }
