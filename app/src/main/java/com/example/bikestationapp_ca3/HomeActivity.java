@@ -18,8 +18,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.bikestationapp_ca3.fragments.ItemFragment;
+import com.example.bikestationapp_ca3.fragments.FavouritesFragment;
 import com.example.bikestationapp_ca3.fragments.MapFragment;
+import com.example.bikestationapp_ca3.fragments.StationsFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -63,8 +64,11 @@ public class HomeActivity extends AppCompatActivity {
         if (menuItem.getItemId() == R.id.nav_map) {
             selectedFragment = new MapFragment();
         }
+        else if (menuItem.getItemId() == R.id.nav_stations) {
+            selectedFragment = new StationsFragment();
+        }
         else if (menuItem.getItemId() == R.id.nav_favourites) {
-            selectedFragment = new ItemFragment();
+            selectedFragment = new FavouritesFragment();
         }
 
         getSupportFragmentManager().beginTransaction().replace(
