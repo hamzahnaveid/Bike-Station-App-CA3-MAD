@@ -14,7 +14,8 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/bicycle"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BikeStationAppCA3">
+        android:theme="@style/Theme.BikeStationAppCA3"
+        android:usesCleartextTraffic="true">
 
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
@@ -36,7 +37,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MapActivity"
+            android:name=".HomeActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"

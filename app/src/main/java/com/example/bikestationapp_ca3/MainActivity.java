@@ -16,9 +16,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -68,28 +65,26 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(
-                            MainActivity.this,
-                            "Logged in successfully!",
-                            Toast.LENGTH_SHORT
-                    ).show();
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(
+                        MainActivity.this,
+                        "Logged in successfully!",
+                        Toast.LENGTH_SHORT
+                ).show();
 
-                    putUserIDInSharedPref(email);
+                putUserIDInSharedPref(email);
 
-                    Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                    startActivity(intent);
-                }
-                else {
-                    Toast.makeText(
-                            MainActivity.this,
-                            "Login failed. Please try again.",
-                            Toast.LENGTH_SHORT
-                    ).show();
-                }
+                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                startActivity(intent);
+            }
+            else {
+                Toast.makeText(
+                        MainActivity.this,
+                        "Login failed. Please try again.",
+                        Toast.LENGTH_SHORT
+                ).show();
             }
         });
     }
