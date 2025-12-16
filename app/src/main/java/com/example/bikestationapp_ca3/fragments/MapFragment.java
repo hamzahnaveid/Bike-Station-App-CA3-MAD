@@ -2,6 +2,9 @@ package com.example.bikestationapp_ca3.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,18 +14,21 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bikestationapp_ca3.R;
 import com.example.bikestationapp_ca3.adapters.StationInfoWindowAdapter;
-import com.example.bikestationapp_ca3.classes.Station;
-import com.example.bikestationapp_ca3.classes.StationMarker;
+import com.example.bikestationapp_ca3.data_classes.Station;
+import com.example.bikestationapp_ca3.helpers.StationIconRendered;
+import com.example.bikestationapp_ca3.helpers.StationMarker;
 import com.example.bikestationapp_ca3.viewmodels.StationViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
@@ -62,11 +68,6 @@ public class MapFragment extends Fragment {
             googleMap.setMyLocationEnabled(true);
             setUpClusterer();
             Log.d("GoogleMap", "Map ready");
-
-            List<Station> stations = stationViewModel.getStations().getValue();
-            if (stations != null) {
-                populateMapWithStations(stations);
-            }
         }
     };
 
@@ -121,14 +122,40 @@ public class MapFragment extends Fragment {
             String address = s.getAddress();
 
             StationMarker marker = new StationMarker(stationLatLng, address, snippet);
+
+            if (s.getStatus().equals("CLOSED")) {
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.closed_station_icon)));
+            }
+            else if (s.getAvailable_bikes() == 0 && s.getAvailable_bike_stands() > 0) {
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.no_bikes_station_icon)));
+
+            }
+            else {
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.station_icon)));
+            }
             clusterManager.addItem(marker);
 
             Log.d("StationMarker", "Marker added: " + s.getName());
         }
     }
 
+    public Bitmap getBitmapFromDrawable(int resId) {
+        Bitmap bitmap = null;
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), resId, null);
+
+        if (drawable != null) {
+            bitmap = Bitmap.createBitmap(120, 120, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+        }
+
+        return bitmap;
+    }
+
     public void setUpClusterer() {
         clusterManager = new ClusterManager<StationMarker>(getActivity(), googleMap);
+        clusterManager.setRenderer(new StationIconRendered(getActivity(), googleMap, clusterManager));
         googleMap.setOnCameraIdleListener(clusterManager);
         googleMap.setOnMarkerClickListener(clusterManager);
     }

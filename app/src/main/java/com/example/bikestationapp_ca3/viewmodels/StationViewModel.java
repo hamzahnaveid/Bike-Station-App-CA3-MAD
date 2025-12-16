@@ -12,7 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bikestationapp_ca3.classes.Station;
+import com.example.bikestationapp_ca3.data_classes.Station;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;

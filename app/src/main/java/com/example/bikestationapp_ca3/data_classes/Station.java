@@ -1,4 +1,4 @@
-package com.example.bikestationapp_ca3.classes;
+package com.example.bikestationapp_ca3.data_classes;
 
 import java.util.Map;
 

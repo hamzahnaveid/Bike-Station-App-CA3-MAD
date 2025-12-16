@@ -24,13 +24,13 @@ public class StationInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     public void renderWindowText(Marker marker, View view) {
         String name = marker.getTitle();
+
         TextView tvName = (TextView) view.findViewById(R.id.iw_name);
         tvName.setText(name);
 
         String snippet = marker.getSnippet();
         TextView tvSnippet = view.findViewById(R.id.iw_snippet);
         tvSnippet.setText(snippet);
-
     }
 
     @Nullable
