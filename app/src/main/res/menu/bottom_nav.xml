@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@drawable/map"
+        android:title="Map"
+        android:iconTint="@color/white" />
+
+    <item
+        android:id="@+id/nav_stations"
+        android:icon="@drawable/bike"
+        android:title="Stations"
+        android:iconTint="@color/white" />
+
+    <item
+        android:id="@+id/nav_favourites"
+        android:icon="@drawable/star"
+        android:title="Favourites"
+        android:iconTint="@color/white" />
+
+</menu>

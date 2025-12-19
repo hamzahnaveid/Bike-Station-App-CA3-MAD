@@ -9,17 +9,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.bikestationapp_ca3.classes.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.example.bikestationapp_ca3.data_classes.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -78,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
         editor.putString("USER", userKey);
         editor.commit();
 
-        Intent intent = new Intent(RegisterActivity.this, MapActivity.class);
+        Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
         startActivity(intent);
     }
 
@@ -88,34 +83,26 @@ public class RegisterActivity extends AppCompatActivity {
 
         String key = ref.push().getKey();
 
-        ref.child(key).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                addUserToAuth(user.getEmail(), user.getPassword());
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(RegisterActivity.this,
-                        e.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
-                e.printStackTrace();
-            }
-        });
+        ref.child(key).setValue(user)
+                .addOnCompleteListener(task -> addUserToAuth(user.getEmail(), user.getPassword()))
+                .addOnFailureListener(e -> {
+                    Toast.makeText(RegisterActivity.this,
+                            e.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    e.printStackTrace();
+                });
         return key;
     }
 
     public void addUserToAuth(String email, String password) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                auth.signInWithEmailAndPassword(email, password);
-                Toast.makeText(RegisterActivity.this,
-                        "User successfully registered",
-                        Toast.LENGTH_SHORT
-                ).show();
-            }
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+            auth.signInWithEmailAndPassword(email, password);
+            Toast.makeText(RegisterActivity.this,
+                    "User successfully registered",
+                    Toast.LENGTH_SHORT
+            ).show();
         });
     }
 }
