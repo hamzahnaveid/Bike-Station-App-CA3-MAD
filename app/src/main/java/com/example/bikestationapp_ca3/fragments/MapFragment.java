@@ -1,15 +1,24 @@
 package com.example.bikestationapp_ca3.fragments;
 
+import static com.example.bikestationapp_ca3.BuildConfig.MAPS_API_KEY;
+
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +32,7 @@ import com.example.bikestationapp_ca3.adapters.StationInfoWindowAdapter;
 import com.example.bikestationapp_ca3.data_classes.Station;
 import com.example.bikestationapp_ca3.helpers.StationIconRendered;
 import com.example.bikestationapp_ca3.helpers.StationMarker;
+import com.example.bikestationapp_ca3.viewmodels.LocationViewModel;
 import com.example.bikestationapp_ca3.viewmodels.StationViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,15 +41,28 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragment extends Fragment {
 
     GoogleMap googleMap;
+    GeoApiContext geoApiContext;
     StationViewModel stationViewModel;
+    LocationViewModel locationViewModel;
     ClusterManager<StationMarker> clusterManager;
+    Location userPosition;
+    Polyline currentPolyline;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -86,15 +109,26 @@ public class MapFragment extends Fragment {
         stationViewModel = new ViewModelProvider(requireActivity()).get(StationViewModel.class);
         stationViewModel.loadStations();
 
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        locationViewModel.loadLocation();
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
+        if(geoApiContext == null) {
+            geoApiContext = new GeoApiContext.Builder()
+                    .apiKey(MAPS_API_KEY)
+                    .build();
+        }
+
         Log.d("MapFragment", "View created");
 
         observeStations();
+        observeLocation();
     }
 
     public void observeStations() {
@@ -106,15 +140,21 @@ public class MapFragment extends Fragment {
         });
     }
 
+    public void observeLocation() {
+        locationViewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location ->
+        {
+            userPosition = location;
+        });
+    }
+
     public void populateMapWithStations(List<Station> stations) {
         googleMap.setInfoWindowAdapter(new StationInfoWindowAdapter(getActivity()));
 
         for (Station s : stations) {
             String snippet = "Status: " + s.getStatus() + "\n" +
-                    "Total Bike Stands: " + s.getBike_stands() + "\n" +
-                    "Available Bike Stands: " + s.getAvailable_bike_stands() + "\n" +
                     "Available Bikes: " + s.getAvailable_bikes() + "\n" +
-                    "Last Updated: " + s.getLast_update();
+                    "Available Stands: " + s.getAvailable_bike_stands() + "\n" +
+                    "Total Stands: " + s.getBike_stands();
 
             double lat = s.getPosition().get("lat");
             double lng = s.getPosition().get("lng");
@@ -139,6 +179,66 @@ public class MapFragment extends Fragment {
         }
     }
 
+    public void calculateDirections(StationMarker marker) {
+        DirectionsApiRequest directions = new DirectionsApiRequest(geoApiContext);
+
+        directions.origin(new com.google.maps.model.LatLng(
+                userPosition.getLatitude(),
+                userPosition.getLongitude()
+        ));
+
+        directions.mode(TravelMode.WALKING);
+        directions.destination(new com.google.maps.model.LatLng(
+                marker.getPosition().latitude,
+                marker.getPosition().longitude
+        )).setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(DirectionsResult result) {
+                addPolylineToMap(result);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(),
+                                        "Duration: " + result.routes[0].legs[0].duration + "\n" +
+                                             "Distance: " + result.routes[0].legs[0].distance,
+                                        Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+                Log.d("calculateDirections", "Routes: " + result.routes[0].toString());
+                Log.d("calculateDirections", "Distance: " + result.routes[0].legs[0].distance);
+                Log.d("calculateDirections", "Duration: " + result.routes[0].legs[0].duration);
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                Log.e("calculateDirections", "Failed to get directions: " + e.getMessage());
+            }
+        });
+    }
+
+    public void addPolylineToMap(DirectionsResult result) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if (currentPolyline != null) {
+                    currentPolyline.remove();
+                }
+                List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(result.routes[0].overviewPolyline.getEncodedPath());
+                List<LatLng> newDecodedPath = new ArrayList<>();
+
+                for(com.google.maps.model.LatLng latLng : decodedPath) {
+                    newDecodedPath.add(new LatLng(
+                            latLng.lat,
+                            latLng.lng
+                    ));
+                }
+                Polyline polyline = googleMap.addPolyline(new PolylineOptions().color(Color.CYAN).geodesic(true).addAll(newDecodedPath));
+                currentPolyline = polyline;
+            }
+        });
+    }
+
     public Bitmap getBitmapFromDrawable(int resId) {
         Bitmap bitmap = null;
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), resId, null);
@@ -158,5 +258,29 @@ public class MapFragment extends Fragment {
         clusterManager.setRenderer(new StationIconRendered(getActivity(), googleMap, clusterManager));
         googleMap.setOnCameraIdleListener(clusterManager);
         googleMap.setOnMarkerClickListener(clusterManager);
+
+        clusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<StationMarker>() {
+            @Override
+            public void onClusterItemInfoWindowClick(StationMarker item) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                builder.setMessage("Determine walking route to " + item.getTitle() + "?")
+                                .setCancelable(true)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                calculateDirections(item);
+                                                dialog.dismiss();
+                                            }
+                                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .show();
+            }
+        });
     }
 }

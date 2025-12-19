@@ -50,6 +50,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.maps.android:android-maps-utils:3.19.0")
+    implementation("com.google.maps:google-maps-services:2.2.0")
+    implementation("org.slf4j:slf4j-simple:1.7.25")
     implementation(libs.googleid)
     implementation(libs.play.services.maps)
     implementation(libs.legacy.support.v4)

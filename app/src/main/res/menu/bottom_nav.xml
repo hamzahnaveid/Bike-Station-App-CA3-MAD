@@ -3,16 +3,19 @@
     <item
         android:id="@+id/nav_map"
         android:icon="@drawable/map"
-        android:title="Map" />
+        android:title="Map"
+        android:iconTint="@color/white" />
 
     <item
         android:id="@+id/nav_stations"
         android:icon="@drawable/bike"
-        android:title="Stations" />
+        android:title="Stations"
+        android:iconTint="@color/white" />
 
     <item
         android:id="@+id/nav_favourites"
         android:icon="@drawable/star"
-        android:title="Favourites" />
+        android:title="Favourites"
+        android:iconTint="@color/white" />
 
 </menu>

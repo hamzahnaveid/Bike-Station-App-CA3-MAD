@@ -47,6 +47,8 @@ public class StationMarker implements ClusterItem {
         return icon;
     }
 
+
+
     public void setIcon(BitmapDescriptor icon) {
         this.icon = icon;
     }
