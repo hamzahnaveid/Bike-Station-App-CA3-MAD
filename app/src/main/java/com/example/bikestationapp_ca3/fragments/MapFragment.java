@@ -168,7 +168,6 @@ public class MapFragment extends Fragment {
             }
             else if (s.getAvailable_bikes() == 0 && s.getAvailable_bike_stands() > 0) {
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.no_bikes_station_icon)));
-
             }
             else {
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.station_icon)));
