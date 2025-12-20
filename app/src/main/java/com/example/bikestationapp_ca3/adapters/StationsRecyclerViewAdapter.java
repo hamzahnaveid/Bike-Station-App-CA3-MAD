@@ -42,14 +42,23 @@ public class StationsRecyclerViewAdapter extends RecyclerView.Adapter<StationsRe
         else if (s.getAvailable_bikes() == 0 && s.getAvailable_bike_stands() > 0) {
             holder.imgStationIcon.setImageResource(R.drawable.no_bikes_station_icon);
         }
+        else if (s.getAvailable_bike_stands() == 0 && s.getAvailable_bikes() > 0) {
+            holder.imgStationIcon.setImageResource(R.drawable.no_stands_station_icon);
+        }
         else {
             holder.imgStationIcon.setImageResource(R.drawable.station_icon);
         }
 
         holder.tvAddress.setText(s.getAddress());
         holder.tvAvailableBikes.setText("Available Bikes: " + String.valueOf(s.getAvailable_bikes()));
-        holder.tvStands.setText("Available Stands: " + String.valueOf(s.getBike_stands()));
-        holder.tvDistance.setText("Distance: " + s.getDistance());
+        holder.tvStands.setText("Available Stands: " + String.valueOf(s.getAvailable_bike_stands()));
+
+        if (s.getDistance() == 0.0) {
+            holder.tvDistance.setText("Distance: Loading...");
+        }
+        else {
+            holder.tvDistance.setText("Distance: " + s.getDistance() + "km");
+        }
         holder.tvStatus.setText(s.getStatus());
 
         if (holder.tvStatus.getText().toString().equals("OPEN")) {

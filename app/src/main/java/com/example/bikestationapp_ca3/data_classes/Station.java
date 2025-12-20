@@ -16,7 +16,7 @@ public class Station {
     private int available_bikes;
     private String status;
     private long last_update;
-    private String distance;
+    private double distance;
 
     public Station() {
 
@@ -118,11 +118,11 @@ public class Station {
         this.last_update = last_update;
     }
 
-    public String getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 }

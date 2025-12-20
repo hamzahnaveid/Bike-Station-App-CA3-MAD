@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,10 +34,9 @@ public class HomeActivity extends AppCompatActivity {
         });
         sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         Log.d("UserID", "User ID:" + sp.getString("USER", "null"));
-
-//        getSupportFragmentManager().beginTransaction().replace(
-//                R.id.main, new MapFragment()
-//        ).commit();
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.fragment_container, new MapFragment()
+        ).commit();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(menuItem -> {
@@ -51,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
             selectedFragment = new MapFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_stations) {
+            Toast.makeText(this, "Loading stations and calculating distances...", Toast.LENGTH_LONG).show();
             selectedFragment = new StationsFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_favourites) {

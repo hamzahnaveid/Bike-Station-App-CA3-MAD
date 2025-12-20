@@ -5,6 +5,7 @@ import static com.example.bikestationapp_ca3.BuildConfig.MAPS_API_KEY;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.example.bikestationapp_ca3.adapters.StationsRecyclerViewAdapter;
 import com.example.bikestationapp_ca3.data_classes.Station;
 import com.example.bikestationapp_ca3.viewmodels.LocationViewModel;
 import com.example.bikestationapp_ca3.viewmodels.StationViewModel;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -30,28 +30,24 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-/**
- * A fragment representing a list of Items.
- */
+
 public class StationsFragment extends Fragment {
 
+    List<Station> cachedStation = new ArrayList<>();
+    int pendingDistances = 0;
     StationsRecyclerViewAdapter adapter;
     StationViewModel stationViewModel;
     LocationViewModel locationViewModel;
     Location currentUserLocation;
     GeoApiContext geoApiContext;
-    String distanceToStation;
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public StationsFragment() {
     }
 
@@ -118,10 +114,12 @@ public class StationsFragment extends Fragment {
     public void observeStations() {
         stationViewModel.getStations().observe(getViewLifecycleOwner(), stations ->
         {
+            cachedStation.clear();
+            pendingDistances = stations.size();
+
             for (Station s : stations) {
-                s.setDistance(calculateDistance(new LatLng(s.getPosition().get("lat"), s.getPosition().get("lng"))));
+                calculateDistance(s);
             }
-            adapter.updateStations(stations);
         });
     }
 
@@ -132,7 +130,7 @@ public class StationsFragment extends Fragment {
         });
     }
 
-    public String calculateDistance(LatLng stationPos) {
+    public void calculateDistance(Station station) {
         DirectionsApiRequest directions = new DirectionsApiRequest(geoApiContext);
 
         directions.origin(new com.google.maps.model.LatLng(
@@ -142,20 +140,35 @@ public class StationsFragment extends Fragment {
 
         directions.mode(TravelMode.WALKING);
         directions.destination(new com.google.maps.model.LatLng(
-                stationPos.latitude,
-                stationPos.longitude
+                station.getPosition().get("lat"),
+                station.getPosition().get("lng")
         )).setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
             public void onResult(DirectionsResult result) {
-                distanceToStation = result.routes[0].legs[0].distance.humanReadable;
+                station.setDistance((double) (result.routes[0].legs[0].distance.inMeters) / 1000);
+                cachedStation.add(station);
+
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pendingDistances--;
+                        if (pendingDistances == 0) {
+                            Collections.sort(cachedStation, new Comparator<Station>() {
+                                @Override
+                                public int compare(Station o1, Station o2) {
+                                    return Double.compare(o1.getDistance(), o2.getDistance());
+                                }
+                            });
+                            adapter.updateStations(cachedStation);
+                        }
+                    }
+                });
             }
 
             @Override
             public void onFailure(Throwable e) {
-
+                Log.e("calculateDirections", "Failed to get directions: " + e.getMessage());
             }
         });
-
-        return distanceToStation;
     }
 }
