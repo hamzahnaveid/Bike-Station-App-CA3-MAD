@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class ProfileFragment extends Fragment {
     User user;
     DatabaseReference ref;
 
+    ImageView ivName, ivEmail;
     TextView tvName, tvEmail;
     EditText etName, etEmail;
     Button btnSaveChanges;
@@ -89,12 +92,35 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 user = snapshot.getValue(User.class);
 
+                ivName = getActivity().findViewById(R.id.iv_name);
+                ivEmail = getActivity().findViewById(R.id.iv_email);
                 tvName = getActivity().findViewById(R.id.tv_name);
                 tvEmail = getActivity().findViewById(R.id.tv_email);
-                etName = getActivity().findViewById(R.id.et_name);
+                etName = getActivity().findViewById(R.id.et_profileName);
                 etEmail = getActivity().findViewById(R.id.et_email);
 
                 btnSaveChanges = getActivity().findViewById(R.id.button_saveChanges);
+
+                ivName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changeName(v);
+                    }
+                });
+
+                ivEmail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changeEmail(v);
+                    }
+                });
+
+                btnSaveChanges.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveChanges(v);
+                    }
+                });
 
                 tvName.setText(user.getName());
                 tvEmail.setText(user.getEmail());
@@ -155,7 +181,7 @@ public class ProfileFragment extends Fragment {
         User updatedUser = new User(email, user.getPassword(), name);
         updatedUser.setFavourites(user.getFavourites());
 
-        ref.setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+        ref.setValue(updatedUser).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(
@@ -175,5 +201,19 @@ public class ProfileFragment extends Fragment {
                 Log.e("FirebaseDB", e.getMessage());
             }
         });
+
+        tvName.setText(updatedUser.getName());
+        etName.setText(updatedUser.getName());
+
+        tvEmail.setText(updatedUser.getEmail());
+        etEmail.setText(updatedUser.getEmail());
+
+        etName.setVisibility(INVISIBLE);
+        tvName.setVisibility(VISIBLE);
+
+        etEmail.setVisibility(INVISIBLE);
+        tvEmail.setVisibility(VISIBLE);
+
+        btnSaveChanges.setEnabled(false);
     }
 }

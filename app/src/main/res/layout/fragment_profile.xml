@@ -70,23 +70,21 @@
         app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/iv_name"
         android:layout_width="37dp"
         android:layout_height="33dp"
         android:layout_marginStart="308dp"
         android:layout_marginTop="20dp"
-        android:onClick="changeName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_profileName"
         app:srcCompat="@drawable/outline_edit_24" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/iv_email"
         android:layout_width="37dp"
         android:layout_height="33dp"
         android:layout_marginStart="312dp"
         android:layout_marginTop="16dp"
-        android:onClick="changeEmail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_profileEmail"
         app:srcCompat="@drawable/outline_edit_24" />
