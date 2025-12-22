@@ -50,6 +50,7 @@ import java.util.List;
 
 public class StationsFragment extends Fragment {
 
+    ValueEventListener listener;
     String uid;
     User user;
     DatabaseReference ref;
@@ -81,6 +82,8 @@ public class StationsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Toast.makeText(getActivity(), "Loading stations and calculating distances...", Toast.LENGTH_LONG).show();
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -91,7 +94,7 @@ public class StationsFragment extends Fragment {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         ref = db.getReference("users").child(uid);
 
-        ref.addValueEventListener(new ValueEventListener() {
+        listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 user = snapshot.getValue(User.class);
@@ -101,7 +104,9 @@ public class StationsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+
+        ref.addValueEventListener(listener);
     }
 
     @Override
@@ -149,6 +154,12 @@ public class StationsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ref.removeEventListener(listener);
+    }
+
     ItemTouchHelper.SimpleCallback favouriteSimpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -177,6 +188,10 @@ public class StationsFragment extends Fragment {
         {
             cachedStation.clear();
             pendingDistances = stations.size();
+
+            //Uncomment these two lines for replacing calculateDistance
+//            cachedStation = stations;
+//            adapter.updateStations(cachedStation);
 
             for (Station s : stations) {
                 calculateDistance(s);

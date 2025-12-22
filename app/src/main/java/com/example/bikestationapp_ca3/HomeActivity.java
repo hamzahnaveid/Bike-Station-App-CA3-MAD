@@ -50,7 +50,6 @@ public class HomeActivity extends AppCompatActivity {
             selectedFragment = new MapFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_stations) {
-//            Toast.makeText(this, "Loading stations and calculating distances...", Toast.LENGTH_LONG).show();
             selectedFragment = new StationsFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_favourites) {

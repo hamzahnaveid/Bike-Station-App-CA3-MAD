@@ -64,6 +64,7 @@ import java.util.List;
 
 public class MapFragment extends Fragment {
 
+    ValueEventListener listener;
     String uid;
     User user;
     DatabaseReference ref;
@@ -77,15 +78,6 @@ public class MapFragment extends Fragment {
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         @Override
         public void onMapReady(GoogleMap map) {
             googleMap = map;
@@ -110,6 +102,26 @@ public class MapFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        SharedPreferences sp = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        uid = sp.getString("USER", "");
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        ref = db.getReference("users").child(uid);
+
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        ref.addValueEventListener(listener);
+
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -140,24 +152,12 @@ public class MapFragment extends Fragment {
 
         observeStations();
         observeLocation();
+    }
 
-        SharedPreferences sp = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        uid = sp.getString("USER", "");
-
-        FirebaseDatabase db = FirebaseDatabase.getInstance();
-        ref = db.getReference("users").child(uid);
-
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                user = snapshot.getValue(User.class);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ref.removeEventListener(listener);
     }
 
     public void observeStations() {
@@ -205,10 +205,12 @@ public class MapFragment extends Fragment {
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.station_icon)));
             }
 
-            for (String stationName : user.getFavourites()) {
-                if (stationName.equals(marker.getTitle())) {
-                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.favourite_station_icon)));
-                    break;
+            if (user.getFavourites().size() > 1) {
+                for (String stationName : user.getFavourites()) {
+                    if (stationName.equals(marker.getTitle())) {
+                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.favourite_station_icon)));
+                        break;
+                    }
                 }
             }
 

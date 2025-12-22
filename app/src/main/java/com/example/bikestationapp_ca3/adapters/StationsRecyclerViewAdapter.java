@@ -55,7 +55,7 @@ public class StationsRecyclerViewAdapter extends RecyclerView.Adapter<StationsRe
         holder.tvStands.setText("Available Stands: " + String.valueOf(s.getAvailable_bike_stands()));
 
         if (s.getDistance() == 0.0) {
-            holder.tvDistance.setText("Distance: Loading...");
+            holder.tvDistance.setText("");
         }
         else {
             holder.tvDistance.setText("Distance: " + s.getDistance() + "km");
