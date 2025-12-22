@@ -63,6 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                     "Password must be at least 6 characters long",
                     Toast.LENGTH_SHORT
             ).show();
+            return;
         }
 
         User user = new User(email, password, name);

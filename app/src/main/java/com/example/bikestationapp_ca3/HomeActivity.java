@@ -33,10 +33,9 @@ public class HomeActivity extends AppCompatActivity {
         });
         sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         Log.d("UserID", "User ID:" + sp.getString("USER", "null"));
-
-//        getSupportFragmentManager().beginTransaction().replace(
-//                R.id.main, new MapFragment()
-//        ).commit();
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.fragment_container, new MapFragment()
+        ).commit();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(menuItem -> {
