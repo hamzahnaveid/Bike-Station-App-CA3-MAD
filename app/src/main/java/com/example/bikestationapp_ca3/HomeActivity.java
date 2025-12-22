@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
             selectedFragment = new MapFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_stations) {
-            Toast.makeText(this, "Loading stations and calculating distances...", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "Loading stations and calculating distances...", Toast.LENGTH_LONG).show();
             selectedFragment = new StationsFragment();
         }
         else if (menuItem.getItemId() == R.id.nav_favourites) {

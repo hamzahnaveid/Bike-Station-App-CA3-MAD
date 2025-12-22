@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikestationapp_ca3.R;
@@ -81,11 +82,13 @@ public class StationsRecyclerViewAdapter extends RecyclerView.Adapter<StationsRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        ConstraintLayout constraintLayout;
         ImageView imgStationIcon;
         TextView tvAddress, tvAvailableBikes, tvStands, tvDistance, tvStatus;
         LinearLayout mainLayout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            constraintLayout = itemView.findViewById(R.id.rv_constraint_layout);
             imgStationIcon = itemView.findViewById(R.id.rv_station_icon);
             tvAddress = itemView.findViewById(R.id.rv_address);
             tvAvailableBikes = itemView.findViewById(R.id.rv_available_bikes);

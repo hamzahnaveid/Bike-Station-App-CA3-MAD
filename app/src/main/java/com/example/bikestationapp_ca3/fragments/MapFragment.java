@@ -4,7 +4,9 @@ import static com.example.bikestationapp_ca3.BuildConfig.MAPS_API_KEY;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,6 +32,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.bikestationapp_ca3.R;
 import com.example.bikestationapp_ca3.adapters.StationInfoWindowAdapter;
 import com.example.bikestationapp_ca3.data_classes.Station;
+import com.example.bikestationapp_ca3.data_classes.User;
 import com.example.bikestationapp_ca3.helpers.StationIconRendered;
 import com.example.bikestationapp_ca3.helpers.StationMarker;
 import com.example.bikestationapp_ca3.viewmodels.LocationViewModel;
@@ -43,6 +46,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -56,6 +64,9 @@ import java.util.List;
 
 public class MapFragment extends Fragment {
 
+    String uid;
+    User user;
+    DatabaseReference ref;
     GoogleMap googleMap;
     GeoApiContext geoApiContext;
     StationViewModel stationViewModel;
@@ -129,6 +140,24 @@ public class MapFragment extends Fragment {
 
         observeStations();
         observeLocation();
+
+        SharedPreferences sp = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        uid = sp.getString("USER", "");
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        ref = db.getReference("users").child(uid);
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void observeStations() {
@@ -175,6 +204,14 @@ public class MapFragment extends Fragment {
             else {
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.station_icon)));
             }
+
+            for (String stationName : user.getFavourites()) {
+                if (stationName.equals(marker.getTitle())) {
+                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(getBitmapFromDrawable(R.drawable.favourite_station_icon)));
+                    break;
+                }
+            }
+
             clusterManager.addItem(marker);
 
             Log.d("StationMarker", "Marker added: " + s.getName());
