@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.bikestationapp_ca3.fragments.FavouritesFragment;
 import com.example.bikestationapp_ca3.fragments.MapFragment;
+import com.example.bikestationapp_ca3.fragments.ProfileFragment;
 import com.example.bikestationapp_ca3.fragments.StationsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -54,6 +55,9 @@ public class HomeActivity extends AppCompatActivity {
         }
         else if (menuItem.getItemId() == R.id.nav_favourites) {
             selectedFragment = new FavouritesFragment();
+        }
+        else if (menuItem.getItemId() == R.id.nav_user) {
+            selectedFragment = new ProfileFragment();
         }
 
         getSupportFragmentManager().beginTransaction().replace(

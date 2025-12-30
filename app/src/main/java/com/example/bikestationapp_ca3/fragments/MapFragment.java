@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -321,6 +322,93 @@ public class MapFragment extends Fragment {
                             }
                         })
                         .show();
+            }
+        });
+
+        clusterManager.setOnClusterItemInfoWindowLongClickListener(new ClusterManager.OnClusterItemInfoWindowLongClickListener<StationMarker>() {
+            @Override
+            public void onClusterItemInfoWindowLongClick(StationMarker item) {
+                List<String> favouriteStationNames = user.getFavourites();
+                boolean isFavourite = false;
+
+                for (String s : favouriteStationNames) {
+                    if (s.equals(item.getTitle())) {
+                        isFavourite = true;
+                        break;
+                    }
+                }
+                showFavouriteDialog(item.getTitle(), isFavourite);
+            }
+        });
+    }
+
+    public void showFavouriteDialog(String stationName, boolean isFavourite) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        if (!isFavourite) {
+            builder.setMessage("Add " + stationName + " Bike Station to Favourites?")
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            addStationToFavourites(stationName, ref);
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+        }
+        else {
+            builder.setMessage("Remove " + stationName + " Bike Station from Favourites?")
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            removeStationFromFavourites(stationName, ref);
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    public void addStationToFavourites(String stationName, DatabaseReference ref) {
+        user.addToFavourites(stationName);
+
+        ref.setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(
+                        getActivity(),
+                        stationName + " added to Favourites",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+    }
+
+    public void removeStationFromFavourites(String stationName, DatabaseReference ref) {
+        user.removeFromFavourites(stationName);
+
+        ref.setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(
+                        getActivity(),
+                        stationName + " removed from Favourites",
+                        Toast.LENGTH_SHORT
+                ).show();
             }
         });
     }

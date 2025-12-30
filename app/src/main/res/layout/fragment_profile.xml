@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.ProfileFragment">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="206dp"
+        android:layout_height="191dp"
+        android:layout_marginStart="102dp"
+        android:layout_marginTop="74dp"
+        android:layout_marginEnd="103dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/user" />
+
+    <TextView
+        android:id="@+id/label_profileName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="Full Name"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
+
+    <ImageView
+        android:id="@+id/iv_name"
+        android:layout_width="37dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_profileName"
+        app:srcCompat="@drawable/outline_edit_24" />
+
+    <Button
+        android:id="@+id/button_saveChanges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:enabled="false"
+        android:onClick="saveChanges"
+        android:text="Save changes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name" />
+
+    <EditText
+        android:id="@+id/et_profileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
+
+    <ImageView
+        android:id="@+id/iv_logout"
+        android:layout_width="40dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/logout"
+        app:layout_constraintBottom_toTopOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/button_deleteUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:backgroundTint="#C21D1D"
+        android:text="Delete account"
+        app:layout_constraintEnd_toEndOf="@+id/button_saveChanges"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_saveChanges" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

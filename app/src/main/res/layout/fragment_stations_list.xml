@@ -7,5 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
+    android:clipToPadding="false"
+    android:paddingBottom="300dp"
     tools:context=".fragments.StationsFragment"
     tools:listitem="@layout/fragment_stations" />
