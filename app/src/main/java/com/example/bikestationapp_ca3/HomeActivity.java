@@ -1,26 +1,39 @@
 package com.example.bikestationapp_ca3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.bikestationapp_ca3.data_classes.User;
 import com.example.bikestationapp_ca3.fragments.FavouritesFragment;
 import com.example.bikestationapp_ca3.fragments.MapFragment;
 import com.example.bikestationapp_ca3.fragments.ProfileFragment;
 import com.example.bikestationapp_ca3.fragments.StationsFragment;
+import com.example.bikestationapp_ca3.services.FavouritesService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class HomeActivity extends AppCompatActivity {
+
+    ValueEventListener listener;
     SharedPreferences sp;
+    User user;
+    DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +47,27 @@ public class HomeActivity extends AppCompatActivity {
         });
         sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         Log.d("UserID", "User ID:" + sp.getString("USER", "null"));
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        String uid = sp.getString("USER", "null");
+        ref = db.getReference("users").child(uid);
+
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+                Intent intent = new Intent(getApplication(), FavouritesService.class);
+                intent.putExtra("user", user);
+                startService(intent);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        ref.addValueEventListener(listener);
+
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.fragment_container, new MapFragment()
         ).commit();
