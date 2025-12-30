@@ -190,12 +190,12 @@ public class StationsFragment extends Fragment {
             pendingDistances = stations.size();
 
             //Uncomment these two lines for replacing calculateDistance
-//            cachedStation = stations;
-//            adapter.updateStations(cachedStation);
+            cachedStation = stations;
+            adapter.updateStations(cachedStation);
 
-            for (Station s : stations) {
-                calculateDistance(s);
-            }
+//            for (Station s : stations) {
+//                calculateDistance(s);
+//            }
         });
     }
 

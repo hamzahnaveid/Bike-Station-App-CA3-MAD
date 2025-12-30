@@ -164,6 +164,13 @@ public class FavouritesFragment extends Fragment {
                     }
                 }
             }
+            if (cachedStation.isEmpty()) {
+                Toast.makeText(
+                        getActivity(),
+                        "Favourites list is empty",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
             adapter.updateStations(cachedStation);
          });
     }

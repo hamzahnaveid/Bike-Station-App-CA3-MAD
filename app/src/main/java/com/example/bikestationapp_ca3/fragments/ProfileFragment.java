@@ -3,14 +3,12 @@ package com.example.bikestationapp_ca3.fragments;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +19,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import com.example.bikestationapp_ca3.MainActivity;
 import com.example.bikestationapp_ca3.R;
 import com.example.bikestationapp_ca3.data_classes.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,11 +40,12 @@ public class ProfileFragment extends Fragment {
     String uid;
     User user;
     DatabaseReference ref;
+    SharedPreferences sp;
 
-    ImageView ivName, ivEmail;
-    TextView tvName, tvEmail;
-    EditText etName, etEmail;
-    Button btnSaveChanges;
+    ImageView ivName, ivLogout;
+    TextView tvName;
+    EditText etName;
+    Button btnSaveChanges, btnDeleteUser;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,7 +85,7 @@ public class ProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        SharedPreferences sp = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        sp = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         uid = sp.getString("USER", "");
 
         FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -93,13 +97,12 @@ public class ProfileFragment extends Fragment {
                 user = snapshot.getValue(User.class);
 
                 ivName = getActivity().findViewById(R.id.iv_name);
-                ivEmail = getActivity().findViewById(R.id.iv_email);
+                ivLogout = getActivity().findViewById(R.id.iv_logout);
                 tvName = getActivity().findViewById(R.id.tv_name);
-                tvEmail = getActivity().findViewById(R.id.tv_email);
                 etName = getActivity().findViewById(R.id.et_profileName);
-                etEmail = getActivity().findViewById(R.id.et_email);
 
                 btnSaveChanges = getActivity().findViewById(R.id.button_saveChanges);
+                btnDeleteUser = getActivity().findViewById(R.id.button_deleteUser);
 
                 ivName.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -108,10 +111,10 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
-                ivEmail.setOnClickListener(new View.OnClickListener() {
+                ivLogout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        changeEmail(v);
+                        logout(v);
                     }
                 });
 
@@ -122,10 +125,15 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
+                btnDeleteUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteUser(v);
+                    }
+                });
+
                 tvName.setText(user.getName());
-                tvEmail.setText(user.getEmail());
                 etName.setText(user.getName());
-                etEmail.setText(user.getEmail());
             }
 
             @Override
@@ -158,19 +166,10 @@ public class ProfileFragment extends Fragment {
         etName.setVisibility(VISIBLE);
     }
 
-    public void changeEmail(View view) {
-        if (!btnSaveChanges.isEnabled()) {
-            btnSaveChanges.setEnabled(true);
-        }
-        tvEmail.setVisibility(INVISIBLE);
-        etEmail.setVisibility(VISIBLE);
-    }
-
     public void saveChanges(View view) {
         String name = etName.getText().toString();
-        String email = etEmail.getText().toString();
 
-        if (name.isEmpty() || email.isEmpty()) {
+        if (name.isEmpty()) {
             Toast.makeText(getActivity(),
                     "Please fill in the required fields",
                     Toast.LENGTH_SHORT
@@ -178,7 +177,7 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-        User updatedUser = new User(email, user.getPassword(), name);
+        User updatedUser = new User(user.getEmail(), user.getPassword(), name);
         updatedUser.setFavourites(user.getFavourites());
 
         ref.setValue(updatedUser).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -205,15 +204,73 @@ public class ProfileFragment extends Fragment {
         tvName.setText(updatedUser.getName());
         etName.setText(updatedUser.getName());
 
-        tvEmail.setText(updatedUser.getEmail());
-        etEmail.setText(updatedUser.getEmail());
-
         etName.setVisibility(INVISIBLE);
         tvName.setVisibility(VISIBLE);
 
-        etEmail.setVisibility(INVISIBLE);
-        tvEmail.setVisibility(VISIBLE);
-
         btnSaveChanges.setEnabled(false);
+    }
+
+    public void deleteUser(View view) throws NullPointerException {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        builder.setMessage("Are you sure that you would like to permanently delete your account?")
+                .setCancelable(true)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        auth.getCurrentUser().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                ref.removeValue();
+
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putString("USER", "");
+                                editor.commit();
+
+                                Toast.makeText(
+                                        getActivity(),
+                                        "Account has been deleted",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
+                        dialog.dismiss();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    public void logout(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        builder.setMessage("Logout and return to login screen?")
+                .setCancelable(true)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        auth.signOut();
+                        dialog.dismiss();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 }

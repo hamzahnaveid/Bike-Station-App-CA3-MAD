@@ -24,26 +24,15 @@
         android:id="@+id/label_profileName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="49dp"
+        android:layout_marginTop="84dp"
         android:text="Full Name"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <TextView
-        android:id="@+id/label_profileEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
-        android:text="Email"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_name" />
 
     <TextView
         android:id="@+id/tv_name"
@@ -57,51 +46,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
 
-    <TextView
-        android:id="@+id/tv_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="168dp"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
-
     <ImageView
         android:id="@+id/iv_name"
         android:layout_width="37dp"
         android:layout_height="33dp"
-        android:layout_marginStart="308dp"
+        android:layout_marginStart="320dp"
         android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_profileName"
         app:srcCompat="@drawable/outline_edit_24" />
 
-    <ImageView
-        android:id="@+id/iv_email"
-        android:layout_width="37dp"
-        android:layout_height="33dp"
-        android:layout_marginStart="312dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_profileEmail"
-        app:srcCompat="@drawable/outline_edit_24" />
-
     <Button
         android:id="@+id/button_saveChanges"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="138dp"
+        android:layout_marginTop="52dp"
         android:enabled="false"
         android:onClick="saveChanges"
         android:text="Save changes"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_email" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_name" />
 
     <EditText
         android:id="@+id/et_profileName"
@@ -117,18 +81,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
 
-    <EditText
-        android:id="@+id/et_email"
+    <ImageView
+        android:id="@+id/iv_logout"
+        android:layout_width="40dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/logout"
+        app:layout_constraintBottom_toTopOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/button_deleteUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="158dp"
-        android:ems="10"
-        android:inputType="text"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:visibility="invisible"
+        android:layout_marginTop="52dp"
+        android:backgroundTint="#C21D1D"
+        android:text="Delete account"
+        app:layout_constraintEnd_toEndOf="@+id/button_saveChanges"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_profileName" />
+        app:layout_constraintTop_toBottomOf="@+id/button_saveChanges" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
