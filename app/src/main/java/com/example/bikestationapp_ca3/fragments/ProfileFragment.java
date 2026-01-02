@@ -261,8 +261,7 @@ public class ProfileFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         auth.signOut();
                         dialog.dismiss();
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
+                        requireActivity().finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

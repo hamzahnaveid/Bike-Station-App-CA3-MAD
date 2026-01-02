@@ -39,10 +39,14 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("USER", "");
+        editor.apply();
+
         auth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference("users");
-
-        sp = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
@@ -74,10 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT
                 ).show();
 
-                putUserIDInSharedPref(email);
-
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                startActivity(intent);
+                putUserIDInSharedPrefAndGoToHomeScreen(email);
             }
             else {
                 Toast.makeText(
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void putUserIDInSharedPref(String email) {
+    public void putUserIDInSharedPrefAndGoToHomeScreen(String email) {
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("USER", child.getKey());
                         editor.commit();
 
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        startActivity(intent);
                     }
                 }
             }
