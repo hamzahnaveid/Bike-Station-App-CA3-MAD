@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="#232D4A"
     tools:context=".MainActivity">
 
     <EditText
@@ -37,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="19dp"
+        android:backgroundTint="#32386F"
         android:enabled="true"
         android:onClick="signIn"
         android:text="Sign in"
@@ -49,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="128dp"
+        android:backgroundTint="#6BC0F2"
         android:enabled="true"
         android:onClick="toRegisterScreen"
         android:text="Create an account"
@@ -67,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/bicycle" />
+        app:srcCompat="@drawable/icon1" />
 
     <TextView
         android:id="@+id/textView"

@@ -3,7 +3,13 @@
     <style name="Base.Theme.BikeStationAppCA3" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/dublin_blue</item>
     </style>
 
     <style name="Theme.BikeStationAppCA3" parent="Base.Theme.BikeStationAppCA3" />
+
+    <style name="DublinTheme" parent="Base.Theme.BikeStationAppCA3">
+        <item name="colorAccent">#31376B</item>
+    </style>
+
 </resources>

@@ -45,6 +45,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
+        android:backgroundTint="#323A6D"
         android:enabled="true"
         android:onClick="register"
         android:text="Create account"
@@ -61,7 +62,6 @@
         android:layout_marginBottom="44dp"
         android:text="Sign Up"
         android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/et_dob"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
