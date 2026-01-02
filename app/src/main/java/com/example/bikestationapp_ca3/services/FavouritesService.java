@@ -50,6 +50,10 @@ public class FavouritesService extends Service {
                     cachedStation.clear();
                     stationViewModel = new StationViewModel(getApplication());
                     User user = (User) intent.getExtras().get("user");
+                    if (user.getFavourites().size() == 1) {
+                        Log.d("Service", "Service shutdown: No favourites found");
+                        return;
+                    }
                     stationViewModel.loadStations();
 
                     try {

@@ -56,9 +56,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 user = snapshot.getValue(User.class);
-                Intent intent = new Intent(getApplication(), FavouritesService.class);
-                intent.putExtra("user", user);
-                startService(intent);
             }
 
             @Override
@@ -78,6 +75,22 @@ public class HomeActivity extends AppCompatActivity {
             getSelectedFragmentAndReplace(menuItem);
             return true;
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Intent intent = new Intent(getApplication(), FavouritesService.class);
+        intent.putExtra("user", user);
+        startService(intent);
+        Log.d("HomeActivity", "Activity stopped");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        stopService(new Intent(getApplication(), FavouritesService.class));
+        Log.d("HomeActivity", "Activity resumed");
     }
 
     @Override
