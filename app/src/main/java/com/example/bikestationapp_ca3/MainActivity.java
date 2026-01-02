@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void putUserIDInSharedPrefAndGoToHomeScreen(String email) {
-        dbRef.addValueEventListener(new ValueEventListener() {
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot child : snapshot.getChildren()) {
