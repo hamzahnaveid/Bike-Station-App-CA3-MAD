@@ -50,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         String uid = sp.getString("USER", "null");
         ref = db.getReference("users").child(uid);
+        Log.d("HomeActivity", "Activity created");
 
         listener = new ValueEventListener() {
             @Override
@@ -77,6 +78,13 @@ public class HomeActivity extends AppCompatActivity {
             getSelectedFragmentAndReplace(menuItem);
             return true;
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(getApplication(), FavouritesService.class));
+        Log.d("HomeActivity", "Activity destroyed");
     }
 
     public void getSelectedFragmentAndReplace(MenuItem menuItem) {
