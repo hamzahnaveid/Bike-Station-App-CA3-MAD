@@ -113,7 +113,6 @@ public class StationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stations_list, container, false);
-
         return view;
     }
 
@@ -190,12 +189,12 @@ public class StationsFragment extends Fragment {
             pendingDistances = stations.size();
 
             //Uncomment these two lines for replacing calculateDistance
-            cachedStation = stations;
-            adapter.updateStations(cachedStation);
+//            cachedStation = stations;
+//            adapter.updateStations(cachedStation);
 
-//            for (Station s : stations) {
-//                calculateDistance(s);
-//            }
+            for (Station s : stations) {
+                calculateDistance(s);
+            }
         });
     }
 
